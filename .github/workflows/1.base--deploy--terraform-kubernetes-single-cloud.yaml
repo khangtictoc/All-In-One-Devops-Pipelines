@@ -36,14 +36,14 @@ on:
           - helm
           - argocd
 
-      deploy_kubernetes:
-        description: "Kubernetes Components"
+      deploy_vault_components:
+        description: "[1] Vault Components"
         required: false
         default: true
         type: boolean
 
-      deploy_vault_components:
-        description: "Vault Components"
+      deploy_kubernetes:
+        description: "[2] Kubernetes Components"
         required: false
         default: true
         type: boolean
