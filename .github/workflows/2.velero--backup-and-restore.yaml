@@ -49,7 +49,6 @@ on:
         options:
           - testproject-dev-general-00-2026.05.31-02.41.44
           - testproject-dev-general-00-2026.05.30-17.16.49
-          - testproject-dev-general-00-2026.04.14-13.27.07
         default: testproject-dev-general-00-2026.05.31-02.41.44
       # --- NAMESPACE SELECTION (BOOLEANS) ---
       backup_jenkins:
