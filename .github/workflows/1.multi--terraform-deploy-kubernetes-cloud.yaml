@@ -71,6 +71,7 @@ on:
 
 env:
   Dummy_Env: "This is dummy env"
+  INPUTSET_FOLDER: "1.multi--terraform-deploy-kubernetes-cloud"
 
 jobs:
   multi-cloud-deploy:
@@ -84,14 +85,14 @@ jobs:
         if: ${{ github.event.inputs.deploy_azure == 'true' }}
         id: azure_inputset
         run: |
-          content=$(jq -c . .github/inputsets/terraform--lab-cloud-k8s/${{ github.event.inputs.azure_inputsets }}.json | jq -R .)
+          content=$(jq -c . .github/inputsets/${{ env.INPUTSET_FOLDER }}/${{ github.event.inputs.azure_inputsets }}.json | jq -R .)
           echo "json=$content" >> $GITHUB_OUTPUT
 
       - name: HCP - Read JSON input set
         if: ${{ github.event.inputs.deploy_hcp == 'true' }}
         id: hcp_inputset
         run: |
-          content=$(jq -c . .github/inputsets/terraform--lab-cloud-k8s/${{ github.event.inputs.hcp_inputsets }}.json | jq -R .)
+          content=$(jq -c . .github/inputsets/${{ env.INPUTSET_FOLDER }}/${{ github.event.inputs.hcp_inputsets }}.json | jq -R .)
           echo "json=$content" >> $GITHUB_OUTPUT
 
       - name: Get workflow ID by name

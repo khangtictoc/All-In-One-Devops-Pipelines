@@ -1,59 +1,95 @@
-name: "[00] Github - Re-Activate All Disabled Workflow Current Repo"
+name: "[00] Github - Daily Re-Activate All Workflows By Repos"
 
 on:
-  # push:
-  #   branches:
-  #     - main
-
   schedule:
-    # Runs at 07:00 AM in every month.
+    # Runs at 07:00 AM every month.
     - cron: "0 7 * */1 *"
-
-  # Optional: You can also allow manual runs
   workflow_dispatch:
+    inputs:
+      whitelist:
+        description: "Name of the JSON file in .github/inputsets (without .json). Defaults to Default_Whitelisted_Repos"
+        required: false
+        default: Default_Whitelisted_Repos
+
+env:
+  INPUTSET_FOLDER: "0.github-enable-workflows"
+  GITHUB_API_VERSION: "2022-11-28"
+  PAT: ${{ secrets.PAT_GITHUB }}
+  DEFAULT_OWNER: ${{ github.repository_owner }}
 
 jobs:
   reactivate-disabled-workflows:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install prerequesite packages
+      - name: Install prerequisite packages
         run: |
-          sudo apt install -y jq
+          sudo apt update && sudo apt install -y jq
 
-      - name: Fetch all workflows
+      - name: Read whitelist JSON
+        id: read_whitelist
         run: |
-          echo "Fetching all workflows..."
-          curl -s -L \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT_GITHUB }}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows \
-            > workflows.json
-
-          if [ ! -s workflows.json ]; then
-            echo "Error: workflows.json is empty. API call failed."
-            cat workflows.json
+          # Read JSON file from .github/inputsets by name (without .json)
+          FILE_NAME="${{ github.event.inputs.whitelist }}"
+          if [ -z "$FILE_NAME" ]; then
+            FILE_NAME=Default_Whitelisted_Repos
+          fi
+          PATH_TO_FILE=.github/inputsets/${FILE_NAME}.json
+          if [ ! -f "$PATH_TO_FILE" ]; then
+            echo "Error: whitelist file not found: $PATH_TO_FILE"
             exit 1
           fi
+          content=$(jq -c . "$PATH_TO_FILE" | jq -R .)
+          echo "json=$content" >> $GITHUB_OUTPUT
 
-          echo "Workflows fetched:"
-          cat workflows.json | jq '.workflows[] | {id, name, state}'
-
-      - name: Enable all workflows
+      - name: Enable workflows across whitelist
         run: |
-          echo "Enabling all workflows..."
-          jq -c '.workflows[]' workflows.json | while read -r row; do
-            ID=$(echo "$row" | jq -r '.id')
-            NAME=$(echo "$row" | jq -r '.name')
-            echo "Enabling: $NAME (ID: $ID)"
-            curl -s -L \
-              -X PUT \
+          set -euo pipefail
+          # Get JSON array from previous step output and unquote it
+          REPOS_JSON=$(echo '${{ steps.read_whitelist.outputs.json }}' | jq -r .)
+          echo "Loaded whitelist JSON: $REPOS_JSON"
+
+          # Parse JSON array into bash array (requires jq)
+          mapfile -t LIST < <(echo "$REPOS_JSON" | jq -r '.[]')
+          for entry in "${LIST[@]}"; do
+            if [ -z "$entry" ]; then
+              continue
+            fi
+            if echo "$entry" | grep -q '/'; then
+              OWNER=$(echo "$entry" | cut -d'/' -f1)
+              REPO=$(echo "$entry" | cut -d'/' -f2-)
+            else
+              OWNER="$DEFAULT_OWNER"
+              REPO="$entry"
+            fi
+
+            echo "Processing repository: $OWNER/$REPO"
+
+            WORKFLOWS_JSON=$(curl -s -L \
               -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer ${{ secrets.PAT_GITHUB }}" \
-              -H "X-GitHub-Api-Version: 2022-11-28" \
-              https://api.github.com/repos/${{ github.repository }}/actions/workflows/$ID/enable
+              -H "Authorization: Bearer $PAT" \
+              -H "X-GitHub-Api-Version: $GITHUB_API_VERSION" \
+              "https://api.github.com/repos/$OWNER/$REPO/actions/workflows")
+
+            if [ -z "$WORKFLOWS_JSON" ] || [ "$(echo "$WORKFLOWS_JSON" | jq -r '.workflows | length')" = "null" ]; then
+              echo "Failed to fetch workflows for $OWNER/$REPO"
+              echo "$WORKFLOWS_JSON"
+              continue
+            fi
+
+            echo "$WORKFLOWS_JSON" | jq -c '.workflows[]' | while read -r wf; do
+              ID=$(echo "$wf" | jq -r '.id')
+              NAME=$(echo "$wf" | jq -r '.name')
+              echo "Enabling workflow '$NAME' (ID: $ID) in $OWNER/$REPO"
+              curl -s -L -X PUT \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: Bearer $PAT" \
+                -H "X-GitHub-Api-Version: $GITHUB_API_VERSION" \
+                "https://api.github.com/repos/$OWNER/$REPO/actions/workflows/$ID/enable" >/dev/null
+            done
           done
+
+      - name: Done
+        run: echo "Completed enabling workflows for target repos."
