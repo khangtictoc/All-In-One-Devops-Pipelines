@@ -36,7 +36,7 @@ jobs:
           if [ -z "$FILE_NAME" ]; then
             FILE_NAME=Default_Whitelisted_Repos
           fi
-          PATH_TO_FILE=.github/inputsets/${FILE_NAME}.json
+          PATH_TO_FILE=.github/inputsets/${{ env.INPUTSET_FOLDER }}/${FILE_NAME}.json
           if [ ! -f "$PATH_TO_FILE" ]; then
             echo "Error: whitelist file not found: $PATH_TO_FILE"
             exit 1
