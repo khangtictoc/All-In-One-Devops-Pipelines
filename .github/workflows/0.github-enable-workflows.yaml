@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       whitelist:
-        description: "Name of the JSON file in .github/inputsets (without .json). Defaults to Default_Whitelisted_Repos"
+        description: "List Name .github/inputsets"
         required: false
         default: Default_Whitelisted_Repos
 
