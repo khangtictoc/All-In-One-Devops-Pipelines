@@ -1,4 +1,4 @@
-name: "[1.0] Terraform - Deploy Kubernetes Single Cloud"
+name: "[1.0.0] Terraform - Deploy Kubernetes Single Cloud"
 
 run-name: >
   [All-In-One] ${{ github.event.inputs.terraform_action }} 
@@ -310,15 +310,3 @@ jobs:
           cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}"
           terragrunt run --all --non-interactive destroy
 
-  cleanup:
-    runs-on: ubuntu-latest
-    if: cancelled() || failure()
-    needs:
-      [deploy-cluster-infra, deploy-k8s-components, deploy-vault-components]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-      - name: Cleanup resources
-        run: |
-          chmod +x script/remove_tf_lock.sh
-          ./script/remove_tf_lock.sh $REGION "terragrunt-state-lock"

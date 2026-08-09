@@ -1,0 +1,45 @@
+name: "[1.1] Terraform Operations"
+
+run-name: "[All-In-One] ${{ github.event.inputs.tf_operation }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      tf_operation:
+        description: "Terraform operation"
+        required: true
+        default: "Release Lock"
+        type: choice
+        options:
+          - Release Lock
+
+      state_key_path:
+        description: "S3 object key for Terraform state lock file"
+        required: true
+        default: "environment/dev/aws/us-east-1/eks/terragrunt.tfstate.tflock"
+        type: string
+
+env:
+  BACKEND_S3_BUCKET: ${{ vars.BACKEND_S3_BUCKET }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  terraform-operations:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify workflow inputs
+        run: |
+          echo "Terraform operation: ${{ github.event.inputs.tf_operation }}"
+          echo "State key path: ${{ github.event.inputs.state_key_path }}"
+          echo "Backend S3 bucket: $BACKEND_S3_BUCKET"
+
+      - name: Release Terraform S3 lock
+        if: ${{ github.event.inputs.tf_operation == 'Release Lock' }}
+        run: |
+          chmod +x script/remove_tf_lock.sh
+          ./script/remove_tf_lock.sh "$BACKEND_S3_BUCKET" "${{ github.event.inputs.state_key_path }}"
