@@ -1,6 +1,6 @@
 name: "[1.1] Terraform Operations"
 
-run-name: "[All-In-One] ${{ github.event.inputs.tf_operation }}"
+run-name: "TF Ops - ${{ github.event.inputs.tf_operation }}"
 
 on:
   workflow_dispatch:
