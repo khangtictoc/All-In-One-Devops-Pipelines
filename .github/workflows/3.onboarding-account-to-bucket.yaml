@@ -13,7 +13,7 @@ on:
         description: "S3 Bucket Name"
         required: true
         type: string
-        default: "velero-backup-kubernetes-aws-454879"
+        default: "velero-backup-kubernetes-aws-d89fgh"
       region:
         description: "AWS Region"
         required: true

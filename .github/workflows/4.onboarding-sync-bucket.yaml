@@ -7,7 +7,7 @@ on:
         description: "Source S3 bucket name"
         required: false
         type: string
-        default: velero-backup-kubernetes-aws
+        default: velero-backup-kubernetes-aws-d89fgh
       dest_bucket:
         description: "Destination S3 bucket name"
         required: false
