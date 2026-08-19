@@ -113,22 +113,6 @@ jobs:
             --file app-source/Dockerfile \
             app-source
 
-      - name: Validate Docker Hub credentials
-        env:
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          if [[ -z "$DOCKERHUB_USERNAME" || -z "$DOCKERHUB_TOKEN" ]]; then
-            echo "DOCKERHUB_USERNAME and DOCKERHUB_TOKEN must be configured." >&2
-            exit 1
-          fi
-
-          if [[ "$DOCKERHUB_USERNAME" =~ [[:space:]] || "$DOCKERHUB_TOKEN" == *$'\r'* || "$DOCKERHUB_TOKEN" == *$'\n'* ]]; then
-            echo "Docker Hub credentials contain whitespace or line breaks. Recreate the secrets without surrounding whitespace." >&2
-            exit 1
-          fi
-
       - name: Log in to Docker Hub
         env:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
