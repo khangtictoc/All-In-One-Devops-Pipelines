@@ -152,10 +152,10 @@ env:
   HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
 
   # ---- TERRAGRUNT ----
-  BACKEND_S3_BUCKET: ${{ vars.BACKEND_S3_BUCKET }}
+  TERRAGRUNT_BACKEND_S3_BUCKET: ${{ vars.TERRAGRUNT_BACKEND_S3_BUCKET }}
   TERRAGRUNT_OUTPUT_S3_BUCKET: ${{ vars.TERRAGRUNT_OUTPUT_S3_BUCKET }}
-  GLOBAL_PROJECT_NAME: ${{ vars.GLOBAL_PROJECT_NAME }}
-  VELERO_BUCKET_NAME: ${{ vars.VELERO_BUCKET_NAME }}
+  TERRAGRUNT_GLOBAL_PROJECT_NAME: ${{ vars.TERRAGRUNT_GLOBAL_PROJECT_NAME }}
+  TERRAGRUNT_VELERO_BUCKET_NAME: ${{ vars.TERRAGRUNT_VELERO_BUCKET_NAME }}
 
   # ---- ENVIRONMENT VARIABLES ----
 
@@ -309,4 +309,3 @@ jobs:
         run: |
           cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}"
           terragrunt run --all --non-interactive destroy
-
