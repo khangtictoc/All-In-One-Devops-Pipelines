@@ -15,7 +15,7 @@ function remove-backup(){
 
 # 1. Source remote utility and initialize colors
 # We use a subshell to ensure sourcing happens before any logging
-source <(curl -sS https://raw.githubusercontent.com/khangtictoc/Productive-Workspace-Set-Up/refs/heads/main/linux/utility/library/bash/init-ansi-color.sh)
+source <(curl -sS https://raw.githubusercontent.com/khangtictoc/Productive-Workspace-Set-Up/refs/heads/main/linux/utility/library/bash/init_ansi_color.sh)
 init-ansi-color
 
 # 2. Validation
