@@ -94,8 +94,8 @@ function update-repo-changes(){
 }
 
 function main(){
-    source <(curl -sS https://raw.githubusercontent.com/khangtictoc/Productive-Workspace-Set-Up/refs/heads/main/linux/utility/library/bash/ansi_color.sh)
-    init-ansicolor
+    source <(curl -sS https://raw.githubusercontent.com/khangtictoc/Productive-Workspace-Set-Up/refs/heads/main/linux/utility/library/bash/init-ansi-color.sh)
+    init-ansi-color
 
     log_highlight "========================================================"
     log_highlight "  VELERO METADATA RECONCILER"

@@ -143,8 +143,8 @@ function execute-restore(){
 
 function main(){
     # Source remote utility
-    source <(curl -sS https://raw.githubusercontent.com/khangtictoc/Productive-Workspace-Set-Up/refs/heads/main/linux/utility/library/bash/ansi_color.sh)
-    init-ansicolor
+    source <(curl -sS https://raw.githubusercontent.com/khangtictoc/Productive-Workspace-Set-Up/refs/heads/main/linux/utility/library/bash/init-ansi-color.sh)
+    init-ansi-color
 
     if [[ -z "$1" ]]; then
         log_error "Missing Argument: Please provide the backup name."
