@@ -18,7 +18,7 @@ on:
         description: "S3 Bucket Name for Terraform Input"
         required: true
         type: string
-        default: "tf-input-kubernetes-aws-d89fgh"
+        default: "terragrunt-input"
       region:
         description: "AWS Region"
         required: true
