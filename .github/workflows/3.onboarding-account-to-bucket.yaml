@@ -59,9 +59,9 @@ jobs:
           # Check if account already exists
           EXISTING=$(echo "$POLICY" | jq --arg account_id "$ACCOUNT_ID" '.Statement[] | select(.Principal.AWS | contains("arn:aws:iam::" + $account_id + ":root"))' 2>/dev/null)
 
-          if [ ! -z "$EXISTING" ]; then
-            echo "❌ Account $ACCOUNT_ID already has access"
-            exit 1
+          if [ -n "$EXISTING" ]; then
+            echo "Account $ACCOUNT_ID already has access; nothing to do"
+            exit 0
           fi
 
           # Add new statement to policy
@@ -124,9 +124,9 @@ jobs:
           # Check if account already exists
           EXISTING=$(echo "$POLICY" | jq --arg account_id "$ACCOUNT_ID" '.Statement[] | select(.Principal.AWS | contains("arn:aws:iam::" + $account_id + ":root"))' 2>/dev/null)
 
-          if [ ! -z "$EXISTING" ]; then
-            echo "❌ Account $ACCOUNT_ID already has access"
-            exit 1
+          if [ -n "$EXISTING" ]; then
+            echo "Account $ACCOUNT_ID already has access; nothing to do"
+            exit 0
           fi
 
           # Add new statement to policy
