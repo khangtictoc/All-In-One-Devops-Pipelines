@@ -71,7 +71,7 @@ jobs:
             '.Statement += [{
               "Effect": "Allow",
               "Principal": {
-                "AWS": "arn:aws:iam::" + $account_id + ":root"
+                "AWS": ("arn:aws:iam::" + $account_id + ":root")
               },
               "Action": [
                 "s3:GetObject",
@@ -79,8 +79,8 @@ jobs:
                 "s3:GetObjectTagging"
               ],
               "Resource": [
-                "arn:aws:s3:::" + $bucket_name,
-                "arn:aws:s3:::" + $bucket_name + "/*"
+                ("arn:aws:s3:::" + $bucket_name),
+                ("arn:aws:s3:::" + $bucket_name + "/*")
               ]
             }]')
 
@@ -106,7 +106,6 @@ jobs:
     steps:
       - name: Add new account to bucket policy
         run: |
-
 
           # Try to get current bucket policy
           if aws s3api get-bucket-policy --bucket "$BUCKET_NAME_TF_INPUT" --region "$REGION" --output json > current-policy.json 2>/dev/null; then
@@ -136,7 +135,7 @@ jobs:
             '.Statement += [{
               "Effect": "Allow",
               "Principal": {
-                "AWS": "arn:aws:iam::" + $account_id + ":root"
+                "AWS": ("arn:aws:iam::" + $account_id + ":root")
               },
               "Action": [
                 "s3:GetObject",
@@ -144,8 +143,8 @@ jobs:
                 "s3:GetObjectTagging"
               ],
               "Resource": [
-                "arn:aws:s3:::" + $bucket_name,
-                "arn:aws:s3:::" + $bucket_name + "/*"
+                ("arn:aws:s3:::" + $bucket_name),
+                ("arn:aws:s3:::" + $bucket_name + "/*")
               ]
             }]')
 
