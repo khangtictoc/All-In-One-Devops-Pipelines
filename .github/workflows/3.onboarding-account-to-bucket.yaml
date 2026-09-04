@@ -1,6 +1,6 @@
 name: "[3.0] Onboard AWS Account to S3 Bucket"
 
-run-name: "[3.0] Onboard AWS Account to S3 Bucket (Account ID: ${{ github.event.inputs.accountID }})"
+run-name: "[3.0] Onboard AWS Account to S3 Bucket (Account ID: ${{ inputs.accountID }})"
 
 on:
   workflow_dispatch:
@@ -29,10 +29,10 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.ADMIN_AWS_ACCESS_KEY }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.ADMIN_AWS_SECRET_KEY }}
 
-  ACCOUNT_ID: ${{ github.event.inputs.accountID }}
-  BUCKET_NAME_VELERO_BACKUP: ${{ github.event.inputs.bucketNameVeleroBackup }}
-  BUCKET_NAME_TF_INPUT: ${{ github.event.inputs.bucketNameTFInput }}
-  REGION: ${{ github.event.inputs.region }}
+  ACCOUNT_ID: ${{ inputs.accountID }}
+  BUCKET_NAME_VELERO_BACKUP: ${{ inputs.bucketNameVeleroBackup }}
+  BUCKET_NAME_TF_INPUT: ${{ inputs.bucketNameTFInput }}
+  REGION: ${{ inputs.region }}
 
 jobs:
   onboard-account-velero-backup-bucket:
