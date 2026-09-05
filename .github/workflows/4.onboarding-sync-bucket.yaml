@@ -4,25 +4,25 @@ on:
   workflow_dispatch:
     inputs:
       source_bucket_velero_backup:
-        description: "Source S3 bucket name"
+        description: "Source S3 Velero Backup Bucket"
         required: false
         type: string
         default: velero-backup-kubernetes-aws-d89fgh
       dest_bucket_velero_backup:
-        description: "Destination S3 bucket name"
+        description: "Destination S3 Velero Backup Bucket"
         required: false
         type: string
-        default: velero-backup-kubernetes-aws-454879
+        default: velero-backup-kubernetes-aws-454871
       source_bucket_tf_input:
-        description: "Source S3 bucket name"
+        description: "Source S3 Terraform Input Bucket"
         required: false
         type: string
-        default: velero-backup-kubernetes-aws-d89fgh
+        default: terragrunt-input
       dest_bucket_tf_input:
-        description: "Destination S3 bucket name"
+        description: "Destination S3 Terraform Input Bucket"
         required: false
         type: string
-        default: velero-backup-kubernetes-aws-454879
+        default: terragrunt-input-ld6ies
       region:
         description: "AWS region"
         required: false
