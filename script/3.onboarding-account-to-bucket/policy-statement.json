@@ -1,0 +1,12 @@
+{
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": null
+    },
+    "Action": [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:GetObjectTagging"
+    ],
+    "Resource": []
+}

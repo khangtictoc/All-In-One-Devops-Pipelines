@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+POLICY_STATEMENT_FILE="$SCRIPT_DIR/policy-statement.json"
+
 : "${ACCOUNT_ID:?ACCOUNT_ID is required}"
 : "${BUCKET_NAME:?BUCKET_NAME is required}"
 : "${REGION:?REGION is required}"
@@ -18,6 +21,15 @@ fi
 
 if [[ -z "$REGION" ]]; then
   echo "ERROR: REGION cannot be empty" >&2
+  exit 1
+fi
+
+if ! jq -e 'type == "object" and
+  .Principal.AWS == null and
+  (.Action | type == "array" and length > 0 and all(.[]; type == "string" and length > 0)) and
+  .Resource == []' \
+  "$POLICY_STATEMENT_FILE" >/dev/null; then
+  echo "ERROR: Invalid policy statement template in '$POLICY_STATEMENT_FILE'" >&2
   exit 1
 fi
 
@@ -51,21 +63,15 @@ fi
 NEW_POLICY=$(jq \
   --arg account_id "$ACCOUNT_ID" \
   --arg bucket_name "$BUCKET_NAME" \
-  '.Statement += [{
-    "Effect": "Allow",
-    "Principal": {
-      "AWS": ("arn:aws:iam::" + $account_id + ":root")
-    },
-    "Action": [
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:GetObjectTagging"
-    ],
-    "Resource": [
-      ("arn:aws:s3:::" + $bucket_name),
-      ("arn:aws:s3:::" + $bucket_name + "/*")
-    ]
-  }]' <<< "$POLICY")
+  --slurpfile statement_template "$POLICY_STATEMENT_FILE" \
+  '.Statement += [
+    ($statement_template[0]
+      | .Principal.AWS = ("arn:aws:iam::" + $account_id + ":root")
+      | .Resource = [
+          ("arn:aws:s3:::" + $bucket_name),
+          ("arn:aws:s3:::" + $bucket_name + "/*")
+        ])
+  ]' <<< "$POLICY")
 
 echo "$NEW_POLICY" | aws s3api put-bucket-policy \
   --bucket "$BUCKET_NAME" \
