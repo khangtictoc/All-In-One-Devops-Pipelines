@@ -29,7 +29,7 @@ if POLICY_DOCUMENT=$(aws s3api get-bucket-policy \
   --query Policy \
   --output text 2>/dev/null); then
   echo "Existing policy found for bucket '$BUCKET_NAME'"
-  POLICY=$(jq -r 'fromjson' <<< "$POLICY_DOCUMENT")
+  POLICY=$(jq -r 'if type == "string" then fromjson else . end' <<< "$POLICY_DOCUMENT")
 else
   echo "No existing policy found for bucket '$BUCKET_NAME'; creating a new one"
   POLICY=$(cat <<'JSON'
@@ -81,4 +81,4 @@ aws s3api get-bucket-policy \
   --region "$REGION" \
   --output json |
   jq --arg principal "$PRINCIPAL" \
-  '.Policy | fromjson | .Statement[]? | select(.Principal.AWS | if type == "array" then index($principal) != null else . == $principal end)'
+  '.Policy | if type == "string" then fromjson else . end | .Statement[]? | select(.Principal.AWS | if type == "array" then index($principal) != null else . == $principal end)'
