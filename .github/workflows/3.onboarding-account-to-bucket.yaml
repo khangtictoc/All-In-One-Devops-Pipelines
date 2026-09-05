@@ -39,127 +39,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Add new account to bucket policy
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Add account access to Velero backup bucket
         run: |
-
-
-          # Try to get current bucket policy
-          if aws s3api get-bucket-policy --bucket "$BUCKET_NAME_VELERO_BACKUP" --region "$REGION" --output json > current-policy.json 2>/dev/null; then
-            echo "✅ Existing policy found"
-            POLICY=$(cat current-policy.json | jq '.Policy | fromjson')
-          else
-            echo "⚠️  No existing policy, creating new one"
-            # Create empty policy structure
-            POLICY='{
-              "Version": "2012-10-17",
-              "Statement": []
-            }'
-          fi
-
-          # Check if account already exists
-          EXISTING=$(echo "$POLICY" | jq --arg account_id "$ACCOUNT_ID" '.Statement[] | select(.Principal.AWS | contains("arn:aws:iam::" + $account_id + ":root"))' 2>/dev/null)
-
-          if [ -n "$EXISTING" ]; then
-            echo "Account $ACCOUNT_ID already has access; nothing to do"
-            exit 0
-          fi
-
-          # Add new statement to policy
-          NEW_POLICY=$(echo "$POLICY" | jq \
-            --arg account_id "$ACCOUNT_ID" \
-            --arg bucket_name "$BUCKET_NAME_VELERO_BACKUP" \
-            '.Statement += [{
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": ("arn:aws:iam::" + $account_id + ":root")
-              },
-              "Action": [
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:GetObjectTagging"
-              ],
-              "Resource": [
-                ("arn:aws:s3:::" + $bucket_name),
-                ("arn:aws:s3:::" + $bucket_name + "/*")
-              ]
-            }]')
-
-          # Apply new policy
-          echo "$NEW_POLICY" | aws s3api put-bucket-policy \
-            --bucket "$BUCKET_NAME_VELERO_BACKUP" \
-            --region "$REGION" \
-            --policy file:///dev/stdin
-
-          echo "✅ Account $ACCOUNT_ID added to bucket policy"
-
-      - name: Verify policy update
-        run: |
-          aws s3api get-bucket-policy \
-            --bucket "$BUCKET_NAME_VELERO_BACKUP" \
-            --region "$REGION" \
-            --output json | jq --arg account_id "$ACCOUNT_ID" \
-            '.Policy | fromjson | .Statement[] | select(.Principal.AWS | contains($account_id))'
+          BUCKET_NAME="$BUCKET_NAME_VELERO_BACKUP" \
+            bash ./script/3.onboarding-account-to-bucket/grant-access-to-root-buckets.sh
 
   onboard-account-tf-input-bucket:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Add new account to bucket policy
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Add account access to Terraform input bucket
         run: |
-
-          # Try to get current bucket policy
-          if aws s3api get-bucket-policy --bucket "$BUCKET_NAME_TF_INPUT" --region "$REGION" --output json > current-policy.json 2>/dev/null; then
-            echo "✅ Existing policy found"
-            POLICY=$(cat current-policy.json | jq '.Policy | fromjson')
-          else
-            echo "⚠️  No existing policy, creating new one"
-            # Create empty policy structure
-            POLICY='{
-              "Version": "2012-10-17",
-              "Statement": []
-            }'
-          fi
-
-          # Check if account already exists
-          EXISTING=$(echo "$POLICY" | jq --arg account_id "$ACCOUNT_ID" '.Statement[] | select(.Principal.AWS | contains("arn:aws:iam::" + $account_id + ":root"))' 2>/dev/null)
-
-          if [ -n "$EXISTING" ]; then
-            echo "Account $ACCOUNT_ID already has access; nothing to do"
-            exit 0
-          fi
-
-          # Add new statement to policy
-          NEW_POLICY=$(echo "$POLICY" | jq \
-            --arg account_id "$ACCOUNT_ID" \
-            --arg bucket_name "$BUCKET_NAME_TF_INPUT" \
-            '.Statement += [{
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": ("arn:aws:iam::" + $account_id + ":root")
-              },
-              "Action": [
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:GetObjectTagging"
-              ],
-              "Resource": [
-                ("arn:aws:s3:::" + $bucket_name),
-                ("arn:aws:s3:::" + $bucket_name + "/*")
-              ]
-            }]')
-
-          # Apply new policy
-          echo "$NEW_POLICY" | aws s3api put-bucket-policy \
-            --bucket "$BUCKET_NAME_TF_INPUT" \
-            --region "$REGION" \
-            --policy file:///dev/stdin
-
-          echo "✅ Account $ACCOUNT_ID added to bucket policy"
-
-      - name: Verify policy update
-        run: |
-          aws s3api get-bucket-policy \
-            --bucket "$BUCKET_NAME_TF_INPUT" \
-            --region "$REGION" \
-            --output json | jq --arg account_id "$ACCOUNT_ID" \
-            '.Policy | fromjson | .Statement[] | select(.Principal.AWS | contains($account_id))'
+          BUCKET_NAME="$BUCKET_NAME_TF_INPUT" \
+            bash ./script/3.onboarding-account-to-bucket/grant-access-to-root-buckets.sh
