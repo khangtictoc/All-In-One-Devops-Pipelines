@@ -15,25 +15,25 @@ on:
           - Import Resource
 
       state_key_path:
-        description: "S3 object key for Terraform state (or explicit .tflock lock file)"
+        description: "S3 Terraform State Key Path"
         required: true
-        default: "environment/dev/aws/us-east-1/eks/terragrunt.tfstate"
+        default: "<environment>/<module>/.../terragrunt.tfstate"
         type: string
 
       terragrunt_module_dir:
-        description: "Terragrunt module directory to target for import"
+        description: "Terragrunt Module Directory"
         required: false
-        default: "Terragrunt_Project_Structure_Design/environment/dev/kubernetes/aws/us-east-1/helm"
+        default: "<PROJECT>/<environment>/<region>/.../<module>"
         type: string
 
       resource_address:
-        description: "Terraform resource address to import"
+        description: "TF Resource Address"
         required: false
-        default: "kubernetes_service_account_v1.alb_controller[0]"
+        default: "aws_s3_bucket.my_example_bucket[0]"
         type: string
 
       resource_id:
-        description: "Terraform import ID for the target resource"
+        description: "Import ID"
         required: false
         default: "kube-system/aws-load-balancer-controller"
         type: string
