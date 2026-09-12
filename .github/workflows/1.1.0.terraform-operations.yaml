@@ -14,9 +14,9 @@ on:
           - Release Lock
 
       state_key_path:
-        description: "S3 object key for Terraform state lock file"
+        description: "S3 object key for Terraform state (or explicit .tflock lock file)"
         required: true
-        default: "environment/dev/aws/us-east-1/eks/terragrunt.tfstate.tflock"
+        default: "environment/dev/aws/us-east-1/eks/terragrunt.tfstate"
         type: string
 
 env:
