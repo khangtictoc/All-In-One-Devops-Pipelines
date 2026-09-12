@@ -23,7 +23,7 @@ on:
       terragrunt_module_dir:
         description: "Terragrunt Module Directory"
         required: false
-        default: "<PROJECT>/<environment>/<region>/.../<module>"
+        default: "<REPO_NAME>/<environment>/<region>/.../<module>"
         type: string
 
       resource_address:
@@ -77,6 +77,6 @@ jobs:
         if: ${{ github.event.inputs.tf_operation == 'Import Resource' }}
         run: |
           ./$IMPORT_RESOURCE_SCRIPT \
-            "${{ github.event.inputs.terragrunt_module_dir }}" \
-            "${{ github.event.inputs.resource_address }}" \
-            "${{ github.event.inputs.resource_id }}"
+            '${{ github.event.inputs.terragrunt_module_dir }}' \
+            '${{ github.event.inputs.resource_address }}' \
+            '${{ github.event.inputs.resource_id }}'
