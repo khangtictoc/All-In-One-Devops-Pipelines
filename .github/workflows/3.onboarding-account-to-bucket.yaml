@@ -34,6 +34,8 @@ env:
   BUCKET_NAME_TF_INPUT: ${{ inputs.bucketNameTFInput }}
   REGION: ${{ inputs.region }}
 
+  MAIN_SCRIPT: script/3\.onboarding-account-to-bucket/grant-access-to-root-buckets\.sh
+
 jobs:
   onboard-account-velero-backup-bucket:
     runs-on: ubuntu-latest
@@ -44,8 +46,10 @@ jobs:
 
       - name: Add account access to Velero backup bucket
         run: |
-          BUCKET_NAME="$BUCKET_NAME_VELERO_BACKUP" \
-            bash ./script/3.onboarding-account-to-bucket/grant-access-to-root-buckets.sh
+          ./$MAIN_SCRIPT \
+            "$ACCOUNT_ID" \
+            "$BUCKET_NAME_VELERO_BACKUP" \
+            "$REGION"
 
   onboard-account-tf-input-bucket:
     runs-on: ubuntu-latest
@@ -56,5 +60,7 @@ jobs:
 
       - name: Add account access to Terraform input bucket
         run: |
-          BUCKET_NAME="$BUCKET_NAME_TF_INPUT" \
-            bash ./script/3.onboarding-account-to-bucket/grant-access-to-root-buckets.sh
+          ./$MAIN_SCRIPT \
+            "$ACCOUNT_ID" \
+            "$BUCKET_NAME_TF_INPUT" \
+            "$REGION"

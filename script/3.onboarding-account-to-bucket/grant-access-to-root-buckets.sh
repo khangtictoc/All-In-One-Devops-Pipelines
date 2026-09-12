@@ -5,9 +5,19 @@ set -euo pipefail
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 POLICY_STATEMENT_FILE="$SCRIPT_DIR/policy-statement.json"
 
-: "${ACCOUNT_ID:?ACCOUNT_ID is required}"
-: "${BUCKET_NAME:?BUCKET_NAME is required}"
-: "${REGION:?REGION is required}"
+if [[ $# -ne 3 ]]; then
+  echo "ERROR: Usage: $0 ACCOUNT_ID BUCKET_NAME REGION" >&2
+  exit 1
+fi
+
+ACCOUNT_ID="$1"
+BUCKET_NAME="$2"
+REGION="$3"
+
+if [[ -z "$ACCOUNT_ID" ]]; then
+  echo "ERROR: ACCOUNT_ID is required" >&2
+  exit 1
+fi
 
 if [[ ! "$ACCOUNT_ID" =~ ^[0-9]{12}$ ]]; then
   echo "ERROR: ACCOUNT_ID must be a 12-digit AWS account ID" >&2
