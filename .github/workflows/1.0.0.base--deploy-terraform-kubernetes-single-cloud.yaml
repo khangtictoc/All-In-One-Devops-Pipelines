@@ -160,6 +160,8 @@ env:
 
   # ---- ENVIRONMENT VARIABLES ----
 
+  TERRAGRUNT_EXEC_SCRIPT: script/1.0.0.base--deploy-terraform-kubernetes-single-cloud/terragrunt_step.sh
+
   REGION: ${{ github.event.inputs.cloud_provider == 'aws' && github.event.inputs.region_aws || github.event.inputs.cloud_provider == 'azure' && github.event.inputs.region_azure || github.event.inputs.cloud_provider == 'hcp' && github.event.inputs.region_hcp || github.event.inputs.cloud_provider == 'kubenetes' && github.event.inputs.region_kubenetes }}
 
   IS_APPLY: ${{ github.event.inputs.terraform_action == 'apply' }}
@@ -216,27 +218,39 @@ jobs:
 
       - name: Terragrunt Plan
         if: env.IS_PLAN == 'true' && env.IS_CLUSTER_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.modules }}"
-          terragrunt run --all  --non-interactive plan
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Terragrunt plan" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.modules }}" \
+            -- terragrunt run --all --non-interactive plan
 
       - name: Terragrunt Apply (Auto Approve)
         if: env.IS_APPLY == 'true' && env.IS_CLUSTER_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.modules }}"
-          terragrunt run --all  --non-interactive apply
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Terragrunt apply" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.modules }}" \
+            -- terragrunt run --all --non-interactive apply
 
       - name: Terragrunt Plan Destroy
         if: env.IS_PLAN_DESTROY == 'true' && env.IS_CLUSTER_DESTROY_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.modules }}"
-          terragrunt run --all  --non-interactive plan -- -destroy
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Terragrunt plan destroy" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.modules }}" \
+            -- terragrunt run --all --non-interactive plan -- -destroy
 
       - name: Kubernetes Components - Terragrunt Destroy (Auto Approve)
         if: env.IS_DESTROY == 'true' && env.IS_CLUSTER_DESTROY_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.modules }}"
-          terragrunt run --all  --non-interactive destroy
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Terragrunt destroy" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.modules }}" \
+            -- terragrunt run --all --non-interactive destroy
 
   deploy-vault-components:
     runs-on: ubuntu-latest
@@ -251,28 +265,39 @@ jobs:
 
       - name: Vault Components - Terragrunt Plan
         if: env.IS_PLAN == 'true' && env.IS_VAULT_COMPONENTS_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/hcp/${{ github.event.inputs.cloud_provider }}/$REGION/vault-components"
-          terragrunt run --non-interactive plan
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Vault components plan" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/hcp/${{ github.event.inputs.cloud_provider }}/$REGION/vault-components" \
+            -- terragrunt run --non-interactive plan
 
       - name: Vault Components - Terragrunt Apply (Auto Approve)
         if: env.IS_APPLY == 'true' && env.IS_VAULT_COMPONENTS_SCOPE == 'true'
+        shell: bash
         run: |
-          set -x
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/hcp/${{ github.event.inputs.cloud_provider }}/$REGION/vault-components"
-          terragrunt run --all --non-interactive apply
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Vault components apply" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/hcp/${{ github.event.inputs.cloud_provider }}/$REGION/vault-components" \
+            -- terragrunt run --all --non-interactive apply
 
       - name: Vault Components - Terragrunt Plan Destroy
         if: env.IS_PLAN_DESTROY == 'true' && env.IS_VAULT_COMPONENTS_DESTROY_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/hcp/${{ github.event.inputs.cloud_provider }}/$REGION/vault-components"
-          terragrunt run --non-interactive plan -- -destroy
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Vault components plan destroy" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/hcp/${{ github.event.inputs.cloud_provider }}/$REGION/vault-components" \
+            -- terragrunt run --non-interactive plan -- -destroy
 
       - name: Vault Components - Terragrunt Destroy (Auto Approve)
         if: env.IS_DESTROY == 'true' && env.IS_VAULT_COMPONENTS_DESTROY_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/hcp/${{ github.event.inputs.cloud_provider }}/$REGION/vault-components"
-          terragrunt run --non-interactive destroy
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Vault components destroy" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/hcp/${{ github.event.inputs.cloud_provider }}/$REGION/vault-components" \
+            -- terragrunt run --non-interactive destroy
 
   deploy-k8s-components:
     runs-on: ubuntu-latest
@@ -288,25 +313,89 @@ jobs:
 
       - name: Kubernetes Components - Terragrunt Plan
         if: env.IS_PLAN == 'true' && env.IS_KUBERNETES_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}"
-          terragrunt run --all --non-interactive plan
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Kubernetes components plan" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}" \
+            -- terragrunt run --all --non-interactive plan
 
       - name: Kubernetes Components - Terragrunt Apply (Auto Approve)
         if: env.IS_APPLY == 'true' && env.IS_KUBERNETES_SCOPE == 'true'
+        shell: bash
         run: |
-          set -x
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}"
-          terragrunt run --all --non-interactive apply
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Kubernetes components apply" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}" \
+            -- terragrunt run --all --non-interactive apply
 
       - name: Kubernetes Components - Terragrunt Plan Destroy
         if: env.IS_PLAN_DESTROY == 'true' && env.IS_KUBERNETES_DESTROY_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}"
-          terragrunt run --all --non-interactive plan -- -destroy
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Kubernetes components plan destroy" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}" \
+            -- terragrunt run --all --non-interactive plan -- -destroy
 
       - name: Terragrunt Destroy (Auto Approve)
         if: env.IS_DESTROY == 'true' && env.IS_KUBERNETES_DESTROY_SCOPE == 'true'
+        shell: bash
         run: |
-          cd "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}"
-          terragrunt run --all --non-interactive destroy
+          ./$TERRAGRUNT_EXEC_SCRIPT \
+            "Kubernetes components destroy" \
+            "Terragrunt_Project_Structure_Design/environment/${{ github.event.inputs.environment }}/kubernetes/${{ github.event.inputs.cloud_provider }}/$REGION/${{ github.event.inputs.deploy_type }}" \
+            -- terragrunt run --all --non-interactive destroy
+
+  workflow-summary:
+    runs-on: ubuntu-latest
+    needs:
+      - verify-configuration
+      - deploy-cluster-infra
+      - deploy-vault-components
+      - deploy-k8s-components
+    if: always()
+
+    steps:
+      - name: Write overall workflow summary
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          summary_date="$(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+
+          verify_result="${{ needs.verify-configuration.result }}"
+          cluster_result="${{ needs.deploy-cluster-infra.result }}"
+          vault_result="${{ needs.deploy-vault-components.result }}"
+          k8s_result="${{ needs.deploy-k8s-components.result }}"
+
+          overall_status="SUCCESS"
+          if [[ "$verify_result" == "failure" || "$cluster_result" == "failure" || "$vault_result" == "failure" || "$k8s_result" == "failure" ]]; then
+            overall_status="FAILED"
+          elif [[ "$verify_result" == "cancelled" || "$cluster_result" == "cancelled" || "$vault_result" == "cancelled" || "$k8s_result" == "cancelled" ]]; then
+            overall_status="CANCELLED"
+          elif [[ "$verify_result" == "skipped" || "$cluster_result" == "skipped" || "$vault_result" == "skipped" || "$k8s_result" == "skipped" ]]; then
+            overall_status="PARTIAL"
+          fi
+
+          {
+            echo "## Workflow Summary"
+            echo "- Date: ${summary_date}"
+            echo "- Overall status: ${overall_status}"
+            echo ""
+            echo "Summary:"
+            echo "- Job status:"
+            echo "  - verify-configuration: ${verify_result^^}"
+            echo "  - deploy-cluster-infra: ${cluster_result^^}"
+            echo "  - deploy-vault-components: ${vault_result^^}"
+            echo "  - deploy-k8s-components: ${k8s_result^^}"
+            echo ""
+            echo "| Job | Status |"
+            echo "| --- | --- |"
+            echo "| verify-configuration | ${verify_result^^} |"
+            echo "| deploy-cluster-infra | ${cluster_result^^} |"
+            echo "| deploy-vault-components | ${vault_result^^} |"
+            echo "| deploy-k8s-components | ${k8s_result^^} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Workflow summary written to $GITHUB_STEP_SUMMARY"
