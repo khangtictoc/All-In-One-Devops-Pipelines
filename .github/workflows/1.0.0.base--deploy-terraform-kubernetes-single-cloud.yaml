@@ -49,7 +49,7 @@ on:
         type: boolean
 
       cloud_provider:
-        description: "Choose Cloud Provider"
+        description: "Cloud Provider"
         required: false
         default: "aws"
         type: choice
@@ -61,7 +61,7 @@ on:
           - kubenetes
 
       modules:
-        description: "Choose Cloud Modules"
+        description: "Cloud Modules"
         required: true
         default: "eks"
         type: choice
@@ -76,7 +76,7 @@ on:
           - vault-components
 
       region_aws:
-        description: "Choose Region for EKS"
+        description: "Region for EKS"
         required: false
         default: "us-east-1"
         type: choice
@@ -86,7 +86,7 @@ on:
           - ap-east-1
 
       region_azure:
-        description: "Choose Region for AKS"
+        description: "Region for AKS"
         required: false
         default: "Japan West"
         type: choice
@@ -96,7 +96,7 @@ on:
           - Japan West
 
       region_hcp:
-        description: "Choose Region for HCP"
+        description: "Region for HCP"
         required: false
         default: "us-west-2"
         type: choice
@@ -106,7 +106,7 @@ on:
           - ap-east-1
 
       region_kubenetes:
-        description: "Choose Region for Kubernetes"
+        description: "Region for Kubernetes"
         required: false
         default: "Japan West"
         type: choice
@@ -119,7 +119,7 @@ on:
           - ap-east-1
 
       environment:
-        description: "Choose Environment"
+        description: "Environment"
         required: false
         default: "dev"
         type: choice
@@ -129,7 +129,7 @@ on:
           - stg
 
       terraform_action:
-        description: "Choose Terraform Action"
+        description: "Terraform Action"
         required: false
         default: "PLAN"
         type: choice

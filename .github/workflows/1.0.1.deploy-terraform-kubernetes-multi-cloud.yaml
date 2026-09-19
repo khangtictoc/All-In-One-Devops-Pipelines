@@ -21,7 +21,7 @@ on:
         type: boolean
 
       azure_inputsets:
-        description: "Choose inputSets for Azure"
+        description: "InputSet for Azure"
         required: true
         default: "Azure_JapanEast_Plan"
         type: choice
@@ -40,7 +40,7 @@ on:
         type: boolean
 
       aws_inputsets:
-        description: "Choose inputSets for AWS"
+        description: "InputSet for AWS"
         required: true
         default: "AWS_us-east-1_Plan"
         type: choice
@@ -59,7 +59,7 @@ on:
         type: boolean
 
       hcp_inputsets:
-        description: "Choose inputSets for HCP"
+        description: "InputSet for HCP"
         required: true
         default: "HCP_us-east-1_Plan"
         type: choice
