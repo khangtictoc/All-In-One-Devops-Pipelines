@@ -164,10 +164,10 @@ env:
 
   REGION: ${{ github.event.inputs.cloud_provider == 'aws' && github.event.inputs.region_aws || github.event.inputs.cloud_provider == 'azure' && github.event.inputs.region_azure || github.event.inputs.cloud_provider == 'hcp' && github.event.inputs.region_hcp || github.event.inputs.cloud_provider == 'kubenetes' && github.event.inputs.region_kubenetes }}
 
-  IS_APPLY: ${{ github.event.inputs.terraform_action == 'apply' }}
-  IS_DESTROY: ${{ github.event.inputs.terraform_action == 'destroy' }}
-  IS_PLAN: ${{ github.event.inputs.terraform_action == 'plan' }}
-  IS_PLAN_DESTROY: ${{ github.event.inputs.terraform_action == 'plan-destroy' }}
+  IS_APPLY: ${{ github.event.inputs.terraform_action == 'APPLY' }}
+  IS_DESTROY: ${{ github.event.inputs.terraform_action == 'DESTROY' }}
+  IS_PLAN: ${{ github.event.inputs.terraform_action == 'PLAN' }}
+  IS_PLAN_DESTROY: ${{ github.event.inputs.terraform_action == 'PLAN-DESTROY' }}
 
   IS_CLUSTER_SCOPE: ${{ (github.event.inputs.deploy_kubernetes == 'true' || github.event.inputs.deploy_vault_components == 'true') || ( github.event.inputs.deploy_kubernetes == 'false' && github.event.inputs.deploy_vault_components == 'false') }}
   IS_VAULT_COMPONENTS_SCOPE: ${{ github.event.inputs.deploy_vault_components == 'true' || github.event.inputs.deploy_kubernetes == 'true'}}

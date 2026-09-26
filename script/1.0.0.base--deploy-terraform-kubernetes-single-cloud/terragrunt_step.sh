@@ -26,19 +26,21 @@ summary_date="$(date -u +"%Y-%m-%d %H:%M:%S UTC")"
 terragrunt_step() {
   local step_title="$1"
   shift
-  local log_file
+  local log_file rc raw_log encoded_log
   log_file="$(mktemp)"
   trap 'rm -f "$log_file"' RETURN
 
-  if "$@" 2>&1 | tee "$log_file"; then
+  set +e
+  "$@" 2>&1 | tee "$log_file"
+  rc=${PIPESTATUS[0]}
+  set -e
+
+  if [[ "$rc" -eq 0 ]]; then
     echo "::notice title=${step_title}::Succeeded"
     return 0
   fi
 
-  local rc=$?
-  local raw_log
   raw_log="$(tr -d '\r' < "$log_file")"
-  local encoded_log
   encoded_log="${raw_log//%/%25}"
   encoded_log="${encoded_log//$'\n'/%0A}"
   encoded_log="${encoded_log//$'\r'/%0D}"
